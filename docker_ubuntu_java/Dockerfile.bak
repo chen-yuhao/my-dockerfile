@@ -1,0 +1,41 @@
+# 引入基础镜像
+FROM ubuntu:16.04
+
+# 运行shell脚本，更换安装源
+COPY run.sh /
+RUN apt-get install bash -y \
+&& /bin/sh run.sh \
+# 安装必要软件
+&& apt-get update && apt-get install vim -y
+
+# 安装jdk
+RUN mkdir /home/java
+ADD jdk1.8.0_151/ /home/java/jdk1.8.0_151
+
+# 安装maven
+RUN mkdir /var/tmp/maven
+ADD apache-maven-3.5.2/ /var/tmp/maven
+
+# 安装tomcat
+# RUN mkdir /usr/local/tomcat
+# ADD apache-tomcat-8.5.23/ /usr/local/tomcat
+
+# 配置环境变量
+ENV MAVEN_HOME=/var/tmp/maven
+ENV PATH=${PATH}:${MAVEN_HOME}/bin
+ENV JAVA_HOME=/home/java/jdk1.8.0_151
+ENV JRE_HOME=/home/java/jdk1.8.0_151/jre
+ENV PATH=$JAVA_HOME/bin/:$JAVA_HOME=/jre/bin:$PATH:$HOME/bin
+# 创建日志文件
+# RUN touch /usr/local/tomcat/bin/run.log
+
+# 部署项目环境
+# ADD freshstart-iec104/server.xml /usr/local/tomcat/conf/
+# ADD freshstart-iec104 /usr/local/tomcat/webapps/freshstart-iec104
+# WORKDIR /usr/local/tomcat/webapps/freshstart-iec104/
+# RUN mvn clean package
+# RUN cd  /usr/local/tomcat/webapps/freshstart-iec104/target/ && mv freshstart-iec104.war /usr/local/tomcat/webapps/
+# RUN cd /usr/
+# WORKDIR /usr/local/tomcat/webapps/
+# RUN rm -rf freshstart-iec104/
+# CMD /usr/local/tomcat/bin/catalina.sh run
